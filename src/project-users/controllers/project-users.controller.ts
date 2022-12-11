@@ -8,8 +8,10 @@ import { ProjectsUserServices } from "../services/projects-users.services";
 
 @Controller('project-users')
 export class ProjectsUserController {
-  constructor(private projectsuserservices:ProjectsUserServices, private authService: AuthService){
-  }
+  constructor(
+    private projectsuserservices:ProjectsUserServices,
+    private authService: AuthService
+    ){}
 
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)

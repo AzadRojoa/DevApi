@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { ProjectsUserServices } from "../../project-users/services/projects-users.services";
 import { UserServices } from "../../users/services/users.services";
 import { PasswordLessUser, User, UserRole } from "../../users/user.entity";
 import { ProjectDTO } from "../dto/project.dto";
@@ -11,7 +12,9 @@ import { Project } from "../project.entity";
 export class ProjectsServices{
   constructor(
     @InjectRepository(Project)
-    private projectRepository: Repository<Project>,private userservices:UserServices
+    private projectRepository: Repository<Project>,
+    private userservices:UserServices,
+    private projectUserServices:ProjectsUserServices,
   ) {}
 
   async createproject(user: PasswordLessUser, Projectbody: ProjectDTO){
@@ -29,12 +32,13 @@ export class ProjectsServices{
     }
     const project = this.projectRepository.findOneBy({id : id})
     if (!project){
-      
+      throw new ForbiddenException()
     }
+    return project
   }
   findall(user: PasswordLessUser){
     if(user.role === "Employee"){
-      throw new UnauthorizedException()
+      return this.projectUserServices.findOnebyid(user.id,user)
     }
     return this.projectRepository.find()
   }

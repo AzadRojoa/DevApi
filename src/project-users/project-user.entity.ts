@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class ProjectUser
@@ -18,4 +18,6 @@ export class ProjectUser
   @Column("uuid")
   userId!: string;
 
+  // @ManyToOne(() => Project, (project) => project.projectUsers)
+  // project: Project
 }

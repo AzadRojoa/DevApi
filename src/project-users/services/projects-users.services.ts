@@ -1,6 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
+import { ProjectsServices } from "../../projects/services/projects.services";
+import { UserServices } from "../../users/services/users.services";
 import { PasswordLessUser,} from "../../users/user.entity";
 import { ProjectUserDTO } from "../dto/project-users.dto";
 import { ProjectUser } from "../project-user.entity";
@@ -11,33 +13,58 @@ import { ProjectUser } from "../project-user.entity";
 export class ProjectsUserServices{
   constructor(
     @InjectRepository(ProjectUser)
-    private projectRepository: Repository<ProjectUser>
+    private projectUserRepository: Repository<ProjectUser>,
+    private userService: UserServices,
+    private projetService: ProjectsServices
   ) {}
 
-  createProjectUser(user: PasswordLessUser, Projectbody: ProjectUserDTO){
+  async createProjectUser(user: PasswordLessUser, Projectbody: ProjectUserDTO){
     if(user.role === "Employee"){
       throw new UnauthorizedException()
     }
-    const present = this.projectRepository.findBy({userId: user.id})
-    if(!present){
-      return this.projectRepository.save(this.projectRepository.create(Projectbody))
+
+    const presentProj = await this.projetService.findOnebyid(Projectbody.projectId, user)
+    const presentUser = await this.userService.findOnebyid(Projectbody.userId)
+    if(!presentProj || !presentUser){
+      throw new NotFoundException();
     }
-    throw new ConflictException()
-    
+
+    const present = await this.projectUserRepository.find({
+      where:[
+        {
+          userId : Projectbody.userId,
+          startDate: Between(Projectbody.startDate,Projectbody.endDate),
+        },
+        {
+          userId : Projectbody.userId,
+          endDate: Between(Projectbody.startDate,Projectbody.endDate)
+        },
+        {
+          userId : Projectbody.userId,
+          startDate: LessThanOrEqual(Projectbody.startDate),
+          endDate: MoreThanOrEqual(Projectbody.endDate)
+        },
+        ]
+    })
+    if(present.length !== 0){
+      throw new ConflictException();
+    }else{
+      return this.projectUserRepository.save(this.projectUserRepository.create(Projectbody))
+    }
   }
-    
+
   findOnebyid(id : string, user: PasswordLessUser){
     if(user.role === "Employee"){
-      return this.projectRepository.findOneBy({id : id,userId : user.id})
+      return this.projectUserRepository.findOneBy({id : id,userId : user.id})
     }
-    return this.projectRepository.findOneBy({id : id})
+    return this.projectUserRepository.findOneBy({id : id})
   }
 
   findall(user: PasswordLessUser){
     if(user.role === "Employee"){
-      return this.projectRepository.findBy({userId: user.id})
+      return this.projectUserRepository.findBy({userId: user.id})
     }
-    return this.projectRepository.find()
+    return this.projectUserRepository.find()
   }
 
   

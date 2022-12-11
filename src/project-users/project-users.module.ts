@@ -11,7 +11,10 @@ import { ProjectsUserServices } from './services/projects-users.services';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProjectUser]),forwardRef(()=> UserModule),forwardRef(()=> ProjectModule), forwardRef(()=> AuthModule)],
+  imports: [TypeOrmModule.forFeature([ProjectUser]),
+  forwardRef(()=> UserModule),
+  forwardRef(()=> ProjectModule),
+  forwardRef(()=> AuthModule)],
   providers: [ProjectsUserServices],
   controllers: [ProjectsUserController],
   exports:[ProjectsUserServices]
