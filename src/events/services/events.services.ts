@@ -14,14 +14,14 @@ export class EventsServices{
     @InjectRepository(Event)
     private eventsRepository: Repository<Event>,
   ) {}
-
-  async createEvent(user: PasswordLessUser, Eventbody: EventsDTO) {
-    const Event = new Events()
-    Event.date = Eventbody.date
-    Event.eventDescription = Eventbody.eventDescription
-    Event.eventType = Eventbody.eventType
-    Event.userId = user.id
-    return this.eventsRepository.save(this.eventsRepository.create(Event))
+  
+  createEvent(user: PasswordLessUser, Eventbody: EventsDTO) {
+    const event = new Events()
+    event.date = Eventbody.date
+    event.eventDescription = Eventbody.eventDescription
+    event.eventType = Eventbody.eventType
+    event.userId = user.id
+    return this.eventsRepository.save(this.eventsRepository.create(event))
   }
 
   findOnebyProjectIdAndUserid(id: string, userid: string ){
