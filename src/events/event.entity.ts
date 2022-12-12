@@ -5,13 +5,13 @@ enum eventStatus {
   ACCEPTED = "Accepted",
   DECLINED = "Declined",
 }
-enum eventType {
+export enum eventType {
   REOTEWORK = "RemoteWork",
   PAIDLEAVE = "PaidLeave",
 }
 
 @Entity()
-export class User {
+export class Events {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
@@ -21,19 +21,19 @@ export class User {
   @Column({
     type: "enum",
     enum: eventStatus,
-    default: [eventStatus.PENDING],
+    default: eventStatus.PENDING,
   })
-  eventStatus!: eventStatus[]
+  eventStatus!: eventStatus
 
   @Column({
     type: "enum",
     enum: eventType,
   })
-  eventType!: eventType[]
+  eventType!: eventType
   
   @Column()
   eventDescription?: string;
 
-  @PrimaryGeneratedColumn("uuid")
+  @Column()
   userId!: string;
 }

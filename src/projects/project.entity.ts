@@ -12,6 +12,6 @@ export class Project {
   @Column({type:'uuid'})
   referringEmployeeId!: string;
   
-  // @OneToMany(() => ProjectUser, (projectUser) => projectUser.project)
-  // projectUsers: ProjectUser[]
+  @OneToMany(() => ProjectUser, (projectUser) => projectUser.project)
+  projectUsers: ProjectUser[];
 }

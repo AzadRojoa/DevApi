@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
+import { Between, FindManyOptions, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { ProjectsServices } from "../../projects/services/projects.services";
 import { UserServices } from "../../users/services/users.services";
 import { PasswordLessUser,} from "../../users/user.entity";
@@ -53,6 +53,10 @@ export class ProjectsUserServices{
     }
   }
 
+  findOnebyProjectIdAndUserid(id: string, userid: string ){
+    return this.projectUserRepository.findOneBy({projectId:id,userId:userid})
+  }
+
   findOnebyid(id : string, user: PasswordLessUser){
     if(user.role === "Employee"){
       return this.projectUserRepository.findOneBy({id : id,userId : user.id})
@@ -67,6 +71,9 @@ export class ProjectsUserServices{
     return this.projectUserRepository.find()
   }
 
+  getAll(options?: FindManyOptions<ProjectUser>) {
+    return this.projectUserRepository.find(options)
+  }
   
  
 }

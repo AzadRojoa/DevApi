@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { OffsetWithoutLimitNotSupportedError, Repository } from "typeorm";
 import { ProjectsUserServices } from "../../project-users/services/projects-users.services";
 import { UserServices } from "../../users/services/users.services";
 import { PasswordLessUser, User, UserRole } from "../../users/user.entity";
@@ -14,6 +14,7 @@ export class ProjectsServices{
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
     private userservices:UserServices,
+    @Inject(forwardRef(() => ProjectsUserServices))
     private projectUserServices:ProjectsUserServices,
   ) {}
 
@@ -26,19 +27,35 @@ export class ProjectsServices{
     
   }
 
-  findOnebyid(id : string, user: PasswordLessUser){
-    if(user.role === "Employee"){
-      throw new UnauthorizedException()
+  async findOnebyid(id: string, user: PasswordLessUser) {
+    if (user.role === "Employee") {
+      const projectuser = await this.projectUserServices.findOnebyProjectIdAndUserid(id,user.id)
+      if (!projectuser){
+        throw new ForbiddenException()
+      }
     }
-    const project = this.projectRepository.findOneBy({id : id})
-    if (!project){
-      throw new ForbiddenException()
+    const project = await this.projectRepository.findOneBy({ id: id })
+    if (project) {
+      return project
     }
-    return project
+    throw new NotFoundException() 
   }
-  findall(user: PasswordLessUser){
+
+  async findallprojects(user: PasswordLessUser){
+    const a = await this.projectUserServices.getAll({
+      where:{
+        userId:user.id,
+      },
+      relations:{
+        project: true,
+      }
+    })
+    return a
+  }
+  async findall(user: PasswordLessUser){
     if(user.role === "Employee"){
-      return this.projectUserServices.findOnebyid(user.id,user)
+      const a = await this.findallprojects(user)
+      return a.map((e)=>e.project)
     }
     return this.projectRepository.find()
   }
