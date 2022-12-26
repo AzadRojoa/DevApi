@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-enum eventStatus {
+export enum eventStatus {
   PENDING = "Pending",
   ACCEPTED = "Accepted",
   DECLINED = "Declined",

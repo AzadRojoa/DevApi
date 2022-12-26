@@ -12,9 +12,20 @@ export class Eventscontroller {
     ){}
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/validate')
+  validateEvents(@Param('id', new ParseUUIDPipe()) id:string ){
+    return this.eventsservices.validateEvent(id)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/decline')
+  declineEvents(@Param('id', new ParseUUIDPipe()) id:string){
+  }
+  
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   @Post()
-  create(@Body() Eventbody: EventsDTO, @Request() req){
+  createEvents(@Body() Eventbody: EventsDTO, @Request() req){
     return this.eventsservices.createEvent(req.user, Eventbody)
   }
 

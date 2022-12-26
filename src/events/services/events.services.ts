@@ -1,39 +1,68 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Between, FindManyOptions, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
-import { ProjectsServices } from "../../projects/services/projects.services";
-import { UserServices } from "../../users/services/users.services";
-import { PasswordLessUser,} from "../../users/user.entity";
-import { EventsDTO } from "../dto/events.dto";
-import { Events } from "../event.entity";
-
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { throws } from 'assert';
+import { Repository } from 'typeorm';
+import { PasswordLessUser, User } from '../../users/user.entity';
+import { EventsDTO } from '../dto/events.dto';
+import { Events, eventStatus } from '../event.entity';
 
 @Injectable()
-export class EventsServices{
+export class EventsServices {
   constructor(
-    @InjectRepository(Event)
-    private eventsRepository: Repository<Event>,
+    @InjectRepository(Events)
+    private eventsRepository: Repository<Events>,
   ) {}
-  
-  createEvent(user: PasswordLessUser, Eventbody: EventsDTO) {
-    const event = new Events()
-    event.date = Eventbody.date
-    event.eventDescription = Eventbody.eventDescription
-    event.eventType = Eventbody.eventType
-    event.userId = user.id
-    return this.eventsRepository.save(this.eventsRepository.create(event))
+
+  async createEvent(user: PasswordLessUser, Eventbody: EventsDTO) {
+    const resultdate = this.checkDate(user.id);
+    if (!resultdate) {
+      throw new UnauthorizedException();
+    }
+    const event = new Events();
+    event.date = Eventbody.date;
+    event.eventDescription = Eventbody.eventDescription;
+    event.eventType = Eventbody.eventType;
+    event.userId = user.id;
+    return this.eventsRepository.save(event);
   }
 
-  findOnebyProjectIdAndUserid(id: string, userid: string ){
-    return null
+  async checkDate(userId: string) {
+    const allEventById = await this.eventsRepository.findBy({ userId: userId });
+    for (let i = 0; i < allEventById.length; i++) {}
+    if (true) {
+      return true;
+    }
   }
 
-  findOnebyid(id : string, user: PasswordLessUser){
-    return null
+  async validateEvent(id: string) {
+    if (this.findOneby(id)) {
+      return this.eventsRepository.update(
+        { id },
+        { eventStatus: eventStatus.ACCEPTED },
+      );
+    }
+  }
+  async declineEvent(id: string) {
+    if (this.findOneby(id)) {
+      return this.eventsRepository.update(
+        { id },
+        { eventStatus: eventStatus.DECLINED },
+      );
+    }
+  }
+  async findOneby(id: string) {
+    return await this.eventsRepository.findOneBy({ id: id });
+  }
+  async findOnebyid(id: string, user: PasswordLessUser) {
+    return this.eventsRepository.findOneBy({ id: id });
   }
 
-  findall(user: PasswordLessUser){
-    return null
+  findall(id: string) {
+    return this.eventsRepository.find();
   }
-
 }
