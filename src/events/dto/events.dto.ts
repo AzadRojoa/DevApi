@@ -1,8 +1,7 @@
-import { IsNotEmpty, MinLength } from "class-validator";
-import { eventType } from "../event.entity";
+import { IsNotEmpty, MinLength } from 'class-validator';
+import { eventType } from '../event.entity';
 
 export class EventsDTO {
-  
   @IsNotEmpty()
   date!: Date;
 
@@ -11,4 +10,8 @@ export class EventsDTO {
 
   @IsNotEmpty()
   eventType!: eventType;
+}
+export class EventsValidateDTO {
+  @IsNotEmpty()
+  id!: string;
 }
