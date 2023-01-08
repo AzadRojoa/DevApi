@@ -3,15 +3,15 @@ import { ProjectUser } from '../project-users/project-user.entity';
 
 @Entity()
 export class Project {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
   name!: string;
-  
-  @Column({type:'uuid'})
+
+  @Column({ type: 'uuid' })
   referringEmployeeId!: string;
-  
+
   @OneToMany(() => ProjectUser, (projectUser) => projectUser.project)
   projectUsers: ProjectUser[];
 }

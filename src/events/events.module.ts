@@ -5,15 +5,10 @@ import { Eventscontroller } from './controllers/events.controller';
 import { Events } from './event.entity';
 import { EventsServices } from './services/events.services';
 
-
-
-
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Events]),
-  forwardRef(()=> AuthModule)],
+  imports: [TypeOrmModule.forFeature([Events]), forwardRef(() => AuthModule)],
   providers: [EventsServices],
   controllers: [Eventscontroller],
-  exports:[EventsServices]
+  exports: [EventsServices],
 })
 export class EventsModule {}

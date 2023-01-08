@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {TypeOrmModule} from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users/controllers/users.controller';
 import { User } from './users/user.entity';
 import { UserServices } from './users/services/users.services';
@@ -13,10 +13,9 @@ import { ProjectUser } from './project-users/project-user.entity';
 import { EventsModule } from './events/events.module';
 import { Events } from './events/event.entity';
 
-
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -26,12 +25,15 @@ import { Events } from './events/event.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User,Project,ProjectUser,Events],
+        entities: [User, Project, ProjectUser, Events],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
-    UserModule,ProjectModule,ProjectUserModule,EventsModule
+    UserModule,
+    ProjectModule,
+    ProjectUserModule,
+    EventsModule,
   ],
   controllers: [],
   providers: [],

@@ -10,8 +10,10 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { UpdateResult } from 'typeorm';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { EventsDTO, EventsValidateDTO } from '../dto/events.dto';
+import { Events } from '../event.entity';
 import { EventsServices } from '../services/events.services';
 
 @Controller('events')
@@ -21,33 +23,40 @@ export class Eventscontroller {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   @Post(':id/validate')
-  validateEvents(@Param('id', new ParseUUIDPipe()) id: EventsValidateDTO) {
+  validateEvents(
+    @Param('id', new ParseUUIDPipe()) id: EventsValidateDTO,
+  ): Promise<UpdateResult> {
     return this.eventsservices.validateEvent(id.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   @Post(':id/decline')
-  declineEvents(@Param('id', new ParseUUIDPipe()) id: EventsValidateDTO) {
+  declineEvents(
+    @Param('id', new ParseUUIDPipe()) id: EventsValidateDTO,
+  ): Promise<UpdateResult> {
     return this.eventsservices.declineEvent(id.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   @Post()
-  createEvents(@Body() Eventbody: EventsDTO, @Request() req) {
+  createEvents(@Body() Eventbody: EventsDTO, @Request() req): Promise<Events> {
     return this.eventsservices.createEvent(req.user, Eventbody);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  getProject(@Param('id', new ParseUUIDPipe()) id: string, @Request() req) {
+  getProject(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Request() req,
+  ): Promise<Events> {
     return this.eventsservices.findOnebyid(id, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  getAllProject() {
+  getAllProject(): Promise<Events[]> {
     return this.eventsservices.findall();
   }
 }

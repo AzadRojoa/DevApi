@@ -1,10 +1,9 @@
-import { IsNotEmpty, MinLength } from "class-validator";
+import { IsNotEmpty, MinLength } from 'class-validator';
 
 export class ProjectUserDTO {
-  
   @IsNotEmpty()
   startDate!: Date;
-  
+
   @IsNotEmpty()
   endDate!: Date;
 
@@ -13,5 +12,4 @@ export class ProjectUserDTO {
 
   @IsNotEmpty()
   projectId!: string;
-
 }

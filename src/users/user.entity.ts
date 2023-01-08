@@ -1,32 +1,31 @@
-
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-export type PasswordLessUser=Omit<User,"password">;
+export type PasswordLessUser = Omit<User, 'password'>;
 
 export enum UserRole {
-  EMPLOYEE = "Employee",
-  ADMIN = "Admin",
-  PROJETCTMANAGER = "ProjectManager",
+  EMPLOYEE = 'Employee',
+  ADMIN = 'Admin',
+  PROJETCTMANAGER = 'ProjectManager',
 }
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   username!: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   email!: string;
 
   @Column()
   password!: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: UserRole,
     default: UserRole.EMPLOYEE,
   })
-  role!: UserRole
+  role!: UserRole;
 }

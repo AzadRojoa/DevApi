@@ -2,9 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Project } from '../projects/project.entity';
 
 @Entity()
-export class ProjectUser
- {
-  @PrimaryGeneratedColumn("uuid")
+export class ProjectUser {
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -13,10 +12,10 @@ export class ProjectUser
   @Column()
   endDate!: Date;
 
-  @Column("uuid")
+  @Column('uuid')
   projectId!: string;
 
-  @Column("uuid")
+  @Column('uuid')
   userId!: string;
 
   @ManyToOne(() => Project, (project) => project.projectUsers)

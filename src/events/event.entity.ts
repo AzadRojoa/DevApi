@@ -1,36 +1,36 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum eventStatus {
-  PENDING = "Pending",
-  ACCEPTED = "Accepted",
-  DECLINED = "Declined",
+  PENDING = 'Pending',
+  ACCEPTED = 'Accepted',
+  DECLINED = 'Declined',
 }
 export enum eventType {
-  REOTEWORK = "RemoteWork",
-  PAIDLEAVE = "PaidLeave",
+  REOTEWORK = 'RemoteWork',
+  PAIDLEAVE = 'PaidLeave',
 }
 
 @Entity()
 export class Events {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
   date!: Date;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: eventStatus,
     default: eventStatus.PENDING,
   })
-  eventStatus!: eventStatus
+  eventStatus!: eventStatus;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: eventType,
   })
-  eventType!: eventType
-  
+  eventType!: eventType;
+
   @Column()
   eventDescription?: string;
 

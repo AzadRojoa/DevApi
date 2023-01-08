@@ -1,65 +1,78 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { OffsetWithoutLimitNotSupportedError, Repository } from "typeorm";
-import { ProjectsUserServices } from "../../project-users/services/projects-users.services";
-import { UserServices } from "../../users/services/users.services";
-import { PasswordLessUser, User, UserRole } from "../../users/user.entity";
-import { ProjectDTO } from "../dto/project.dto";
-import { Project } from "../project.entity";
-
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OffsetWithoutLimitNotSupportedError, Repository } from 'typeorm';
+import { ProjectUser } from '../../project-users/project-user.entity';
+import { ProjectsUserServices } from '../../project-users/services/projects-users.services';
+import { UserServices } from '../../users/services/users.services';
+import { PasswordLessUser, User, UserRole } from '../../users/user.entity';
+import { ProjectDTO } from '../dto/project.dto';
+import { Project } from '../project.entity';
 
 @Injectable()
-export class ProjectsServices{
+export class ProjectsServices {
   constructor(
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
-    private userservices:UserServices,
+    private userservices: UserServices,
     @Inject(forwardRef(() => ProjectsUserServices))
-    private projectUserServices:ProjectsUserServices,
+    private projectUserServices: ProjectsUserServices,
   ) {}
 
-  async createproject(user: PasswordLessUser, Projectbody: ProjectDTO){
-    if(user.role === "Admin" && ((await this.userservices.findOnebyid(Projectbody.referringEmployeeId)).role !== "Employee")){
-      return this.projectRepository.save(this.projectRepository.create(Projectbody))
-    }else{
-      throw new UnauthorizedException()
+  async createproject(
+    user: PasswordLessUser,
+    Projectbody: ProjectDTO,
+  ): Promise<Project> {
+    if (
+      user.role === 'Admin' &&
+      (await this.userservices.findOnebyid(Projectbody.referringEmployeeId))
+        .role !== 'Employee'
+    ) {
+      return this.projectRepository.save(
+        this.projectRepository.create(Projectbody),
+      );
+    } else {
+      throw new UnauthorizedException();
     }
-    
   }
 
-  async findOnebyid(id: string, user: PasswordLessUser) {
-    if (user.role === "Employee") {
-      const projectuser = await this.projectUserServices.findOnebyProjectIdAndUserid(id,user.id)
-      if (!projectuser){
-        throw new ForbiddenException()
+  async findOnebyid(id: string, user: PasswordLessUser): Promise<Project> {
+    if (user.role === 'Employee') {
+      const projectuser =
+        await this.projectUserServices.findOnebyProjectIdAndUserid(id, user.id);
+      if (!projectuser) {
+        throw new ForbiddenException();
       }
     }
-    const project = await this.projectRepository.findOneBy({ id: id })
+    const project = await this.projectRepository.findOneBy({ id: id });
     if (project) {
-      return project
+      return project;
     }
-    throw new NotFoundException() 
+    throw new NotFoundException();
   }
 
-  async findallprojects(user: PasswordLessUser){
+  async findallprojects(user: PasswordLessUser): Promise<ProjectUser[]> {
     const a = await this.projectUserServices.getAll({
-      where:{
-        userId:user.id,
+      where: {
+        userId: user.id,
       },
-      relations:{
+      relations: {
         project: true,
-      }
-    })
-    return a
+      },
+    });
+    return a;
   }
-  async findall(user: PasswordLessUser){
-    if(user.role === "Employee"){
-      const a = await this.findallprojects(user)
-      return a.map((e)=>e.project)
+  async findall(user: PasswordLessUser): Promise<Project[]> {
+    if (user.role === 'Employee') {
+      const a = await this.findallprojects(user);
+      return a.map((e) => e.project);
     }
-    return this.projectRepository.find()
+    return this.projectRepository.find();
   }
-
-  
- 
 }

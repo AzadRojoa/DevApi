@@ -1,7 +1,6 @@
-import { IsNotEmpty, MinLength } from "class-validator";
+import { IsNotEmpty, MinLength } from 'class-validator';
 
 export class ProjectDTO {
-  
   @IsNotEmpty()
   @MinLength(3)
   name!: string;

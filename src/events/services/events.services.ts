@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { throws } from 'assert';
 import { use } from 'passport';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { PasswordLessUser, User } from '../../users/user.entity';
 import { EventsDTO, EventsValidateDTO } from '../dto/events.dto';
 import { Events, eventStatus, eventType } from '../event.entity';
@@ -20,7 +20,10 @@ export class EventsServices {
     private eventsRepository: Repository<Events>,
   ) {}
 
-  async createEvent(user: PasswordLessUser, Eventbody: EventsDTO) {
+  async createEvent(
+    user: PasswordLessUser,
+    Eventbody: EventsDTO,
+  ): Promise<Events> {
     const resultdate = await this.checkDate(user.id, Eventbody);
     if (resultdate) {
       throw new UnauthorizedException();
@@ -42,7 +45,11 @@ export class EventsServices {
     return this.eventsRepository.save(event);
   }
 
-  async checkDate(userId: string, Eventbody: EventsDTO, nbRemoteWork = 0) {
+  async checkDate(
+    userId: string,
+    Eventbody: EventsDTO,
+    nbRemoteWork = 0,
+  ): Promise<boolean> {
     const allEventById = await this.eventsRepository.findBy({ userId: userId });
     const date: Date = new Date(Eventbody.date);
     const dayEvent = date.getDate();
@@ -96,7 +103,7 @@ export class EventsServices {
     }
   }
 
-  async validateEvent(id: string) {
+  async validateEvent(id: string): Promise<UpdateResult> {
     const isHere = await this.findOneby(id);
     if (isHere) {
       return this.eventsRepository.update(
@@ -106,7 +113,7 @@ export class EventsServices {
     }
   }
 
-  async declineEvent(id: string) {
+  async declineEvent(id: string): Promise<UpdateResult> {
     const isHere = await this.findOneby(id);
     if (isHere) {
       return this.eventsRepository.update(
@@ -116,15 +123,15 @@ export class EventsServices {
     }
   }
 
-  async findOneby(id: string) {
+  async findOneby(id: string): Promise<Events> {
     return await this.eventsRepository.findOneBy({ id: id });
   }
 
-  async findOnebyid(id: string, user: PasswordLessUser) {
+  async findOnebyid(id: string, user: PasswordLessUser): Promise<Events> {
     return this.eventsRepository.findOneBy({ id: id });
   }
 
-  findall() {
+  findall(): Promise<Events[]> {
     return this.eventsRepository.find();
   }
 }

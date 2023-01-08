@@ -1,5 +1,11 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
-import { UserRole } from "../user.entity";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { UserRole } from '../user.entity';
 
 export class LoginUserDTO {
   @IsNotEmpty()
@@ -10,7 +16,6 @@ export class LoginUserDTO {
 }
 
 export class SignupUserDTO {
-  
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
